@@ -1,10 +1,11 @@
 Kayobe-Config-Docker
 ####################
 
-A WIP jenkins setup to run kayobe commands from a seed host.
+A reference jenkins setup to run kayobe commands from a seed host.
 
 How to use
 ----------
+
 First add the contents of the `kayobe-docker` directory
 to the root of your Kayobe-Config repo like so::
     kayobe_config/
@@ -12,7 +13,8 @@ to the root of your Kayobe-Config repo like so::
     ├── Jenkinsfile  
 
 Don't forget to add and commit the changes to the branch
-you wish to deploy.
+you wish to deploy. Eventually this will be upstream in
+the kayobe_config templates.
 
 Next, edit the contents of jenkins_config (if necessary)
 and ensure the following:
