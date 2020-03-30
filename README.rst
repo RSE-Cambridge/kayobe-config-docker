@@ -10,7 +10,8 @@ First add the contents of the `kayobe-docker` directory
 to the root of your Kayobe-Config repo like so::
     kayobe_config/
     ├── Dockerfile
-    ├── Jenkinsfile  
+    ├── Jenkinsfile
+    ├── docker-entrypoint.sh
 
 Don't forget to add and commit the changes to the branch
 you wish to deploy. Eventually this will be upstream in
