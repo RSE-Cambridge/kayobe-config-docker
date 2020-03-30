@@ -31,14 +31,14 @@ sudo docker run --name=nginx_proxy \
      --detach=true \
      jwilder/nginx-proxy:latest
 
-sudo mkdir -p /var/jenkins_home/jenkins_config
-sudo cp -r jenkins_config/ /var/jenkins_home/
+sudo mkdir -p /var/jenkins-home/jenkins-config
+sudo cp -r jenkins-config/ /var/jenkins-home/
 
 echo "jenkins container id:"
 sudo docker run --name=jenkins \
      --env="VIRTUAL_PORT=8080" \
      --env="VIRTUAL_HOST=10.200.0.1" \
-     --volume="/var/jenkins_home:/var/jenkins_home:rw" \
+     --volume="/var/jenkins-home:/var/jenkins-home:rw" \
      --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
      -p 0.0.0.0:18080:8080 \
      -p 0.0.0.0:50000:50000 \
