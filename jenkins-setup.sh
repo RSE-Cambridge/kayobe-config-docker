@@ -11,12 +11,16 @@ sudo docker push 10.200.0.1:4000/jenkins-docker:latest
 sudo mkdir -p /etc/nginx-proxy/htpasswd
 sudo mkdir -p /etc/nginx-proxy/certs
 
-admin_basic_passwd=$(openssl rand -base64 32)
-admin_basic_htpasswd=$(printf "admin:$(openssl passwd -apr1 $admin_basic_passwd )\n")
-sudo -E sh -c 'echo "${admin_basic_htpasswd}" > /etc/nginx-proxy/htpasswd/jenkins.htpasswd'
+export admin_basic_passwd=$(openssl rand -base64 32)
+export admin_basic_htpasswd=$(printf "admin:$(openssl passwd -apr1 $admin_basic_passwd )\n")
+export nginx_htpasswd_file="/etc/nginx-proxy/htpasswd/jenkins.htpasswd"
+sudo -E sh -c 'test -f "${nginx_htpasswd_file}" || echo "${admin_basic_htpasswd}" > "${nginx_htpasswd_file}"'
+
+# Ensure non-world readable
+sudo -E sh -c 'chown root:root "${nginx_htpasswd_file}" && chmod 660 "${nginx_htpasswd_file}"'
 
 echo "Jenkins basic auth admin password:"
-echo "${admin_basic_passwd}"
+echo "$(sudo -E cat $nginx_htpasswd_file)"
 echo ""
 
 echo "nginx_proxy container id:"
