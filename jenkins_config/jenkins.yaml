@@ -18,7 +18,7 @@ jenkins:
 
 unclassified:
   location:
-    url: "http://192.168.33.5/"
+    url: "http://10.200.0.1/"
   pipeline-model-docker:
     dockerLabel: "docker"
 

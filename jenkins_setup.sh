@@ -4,9 +4,9 @@ set -euo pipefail
 
 sudo ./jenkins-docker/build.sh
 
-sudo docker tag jenkins-docker:latest 192.168.33.5:4000/jenkins-docker:latest
+sudo docker tag jenkins-docker:latest 10.200.0.1:4000/jenkins-docker:latest
 
-sudo docker push 192.168.33.5:4000/jenkins-docker:latest
+sudo docker push 10.200.0.1:4000/jenkins-docker:latest
 
 sudo mkdir -p /etc/nginx-proxy/htpasswd
 sudo mkdir -p /etc/nginx-proxy/certs
@@ -37,11 +37,11 @@ sudo cp -r jenkins_config/ /var/jenkins_home/
 echo "jenkins container id:"
 sudo docker run --name=jenkins \
      --env="VIRTUAL_PORT=8080" \
-     --env="VIRTUAL_HOST=192.168.33.5" \
+     --env="VIRTUAL_HOST=10.200.0.1" \
      --volume="/var/jenkins_home:/var/jenkins_home:rw" \
      --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
      -p 0.0.0.0:18080:8080 \
      -p 0.0.0.0:50000:50000 \
      --restart=always \
      --detach=true \
-     192.168.33.5:4000/jenkins-docker:latest
+     10.200.0.1:4000/jenkins-docker:latest

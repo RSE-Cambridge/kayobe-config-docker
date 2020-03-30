@@ -6,9 +6,9 @@ jobs:
             scm {
               git {
                 remote {
-                  url('https://github.com/Wasaac/a-universe-from-nothing')
+                  url('https://github.com/RSE-Cambridge/cumulus-kayobe-config')
                 }
-                branch('*/monasca-stein-dockerise')
+                branch('*/preprod-stein-jenkins')
               }
             }
             lightweight()
