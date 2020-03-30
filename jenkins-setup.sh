@@ -13,7 +13,7 @@ sudo mkdir -p /etc/nginx-proxy/certs
 
 admin_basic_passwd=$(openssl rand -base64 32)
 admin_basic_htpasswd=$(printf "admin:$(openssl passwd -apr1 $admin_basic_passwd )\n")
-sudo sh -c 'echo "${admin_basic_htpasswd}" > /etc/nginx-proxy/htpasswd/jenkins.htpasswd'
+sudo -E sh -c 'echo "${admin_basic_htpasswd}" > /etc/nginx-proxy/htpasswd/jenkins.htpasswd'
 
 echo "Jenkins basic auth admin password:"
 echo "${admin_basic_passwd}"
