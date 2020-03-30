@@ -8,7 +8,7 @@ jobs:
                 remote {
                   url('https://github.com/RSE-Cambridge/cumulus-kayobe-config')
                 }
-                branch('*/preprod-stein-jenkins')
+                branch('*/preprod-train-jenkins')
               }
             }
             lightweight()
