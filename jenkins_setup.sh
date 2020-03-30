@@ -2,10 +2,6 @@
 
 set -euo pipefail
 
-if [ ! -e "./jenkins-docker" ];then
-    git clone https://github.com/Wasaac/jenkins-docker.git
-fi
-
 sudo ./jenkins-docker/build.sh
 
 sudo docker tag jenkins-docker:latest 192.168.33.5:4000/jenkins-docker:latest

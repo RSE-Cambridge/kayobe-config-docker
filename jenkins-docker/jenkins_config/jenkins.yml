@@ -1,0 +1,29 @@
+jenkins:
+  agentProtocols:
+  - "JNLP4-connect"
+  clouds:
+  - docker:
+      dockerApi:
+        connectTimeout: 60
+        dockerHost:
+          uri: "unix:///var/run/docker.sock"
+        readTimeout: 60
+      name: "docker"
+  labelString: "docker"
+  slaveAgentPort: 50000
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins-ci.org/update-center.json"
+
+unclassified:
+  location:
+    url: "http://192.168.33.5/"
+  pipeline-model-docker:
+    dockerLabel: "docker"
+
+tool:
+  git:
+    installations:
+    - home: "git"
+      name: "Default"
