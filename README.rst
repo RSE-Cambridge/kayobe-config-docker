@@ -12,6 +12,10 @@ to the root of your Kayobe-Config repo like so::
     ├── Dockerfile
     ├── Jenkinsfile
     ├── docker-entrypoint.sh
+    ├── ansible.cfg
+
+If an `ansible.cfg` file already exists in the kayobe-config
+repo then this file will need to be merged.
 
 Don't forget to add and commit the changes to the branch
 you wish to deploy. Eventually this will be upstream in
