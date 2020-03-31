@@ -38,6 +38,45 @@ Copy or clone this repo (with your changes) onto a Kayobe
 seed node and run ``jenkins_setup.sh`` as a user with both sudo
 and docker privileges.
 
+Post configuration and running an initial job
+---------------------------------------------
+
+* Retrieve the secret from the output of ``jenkins_setup.sh``:
+
+.. image:: images/password-output.png
+
+* Navigate to the address set using ``jenkins_virtual_host`` and
+  enter the password from the previous step (the username is admin):
+
+.. image:: images/login.png
+
+* Start a build to trigger the initial import of the job:
+
+.. image:: images/initial-build.png
+
+.. note:: the initial build will fail as it lacks some necessary parameters.
+
+* Navigate to the job and press ``Build with parameters``:
+
+.. image:: images/build-with-parameters.png
+
+* Add an SSH private key by clicking ``jenkins`` under the ``Add`` button:
+
+.. image:: images/ssh-key-1.png
+
+* Fill in the details as shown in the screenshot below:
+
+.. image:: images/ssh-key-2.png
+
+* Add a ``secret text`` credential for the kayobe vault password:
+
+.. image: images/vault-password.png
+
+* Start a run with a command of your choice. In the example we are
+  running: ``kayobe network connectivity check```:
+
+.. image:: images/build.png
+
 TODO
 ####
 
