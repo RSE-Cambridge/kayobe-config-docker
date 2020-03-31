@@ -2,16 +2,30 @@ pipeline {
     options { disableConcurrentBuilds() }
     agent { label 'docker' }
     parameters {
-        credentials credentialType: 'com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey', defaultValue: '', description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', required: true
-        password defaultValue: 'SECRET', description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD'
-        string defaultValue: 'http://localhost:5000/', description: 'Docker Registry to push images to', name: 'DOCKER_REGISTRY', trim: true
+        credentials credentialType: 'com.cloudbees.jenkins.plugins.sshcredentials.impl.BasicSSHUserPrivateKey', defaultValue: 'kayobe-ssh-private-key', description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', required: true
+        credentials credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.StringCredentialsImpl', defaultValue: 'kayobe-vault-password', description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD', required: true
+        string defaultValue: 'http://localhost:4000/', description: 'Docker Registry to push images to', name: 'DOCKER_REGISTRY', trim: true
+        string description: 'Command to run in docker container', name: 'COMMAND', trim: false
         credentials credentialType: 'org.jenkinsci.plugins.plaincredentials.impl.FileCredentialsImpl', description: 'Kayobe SSH Config file', name: 'KAYOBE_SSH_CONFIG', required: false
     }
     environment {
         REGISTRY = "${params.DOCKER_REGISTRY}"
         KAYOBE_IMAGE = "${currentBuild.projectName}:${env.GIT_COMMIT}"
     }
+
     stages {
+        // Do parameter validation in a stage so that the git checkout of the pipeline still works.
+        // This is necessary to update the build parameters.
+        stage('Validate parameters') {
+            steps {
+                script {
+                    if (!params.COMMAND){
+                        // Fail early
+                        error("You must set the COMMAND parameter")
+                    }
+                }
+            }
+        }
         stage('Build and Push') {
             steps {
                 script {
@@ -27,7 +41,7 @@ pipeline {
             stages {
                 stage('Prepare Secrets') {
                     environment {
-                        KAYOBE_VAULT_PASSWORD = "${params.KAYOBE_VAULT_PASSWORD}"
+                        KAYOBE_VAULT_PASSWORD = credentials("${params.KAYOBE_VAULT_PASSWORD}")
                         KAYOBE_SSH_CREDS_FILE = credentials("${params.KAYOBE_SSH_CREDS}")
                     }
                     steps {
@@ -57,14 +71,13 @@ pipeline {
                         }
                     }
                     environment {
-                        KAYOBE_VAULT_PASSWORD = "${params.KAYOBE_VAULT_PASSWORD}"
+                        KAYOBE_VAULT_PASSWORD = credentials("${params.KAYOBE_VAULT_PASSWORD}")
                     }
                     steps {
                         sh 'cp -R secrets/. /secrets'
                         sh '/bin/entrypoint.sh echo READY'
                         sh 'kayobe control host bootstrap'
-                        sh 'kayobe overcloud inventory discover'
-                        sh 'kayobe overcloud service reconfigure'
+                        sh "${params.COMMAND}"
                     }
                 }
             }
