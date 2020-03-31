@@ -54,7 +54,7 @@ Post configuration and running an initial job
 
 .. image:: images/initial-build.png
 
-.. note:: the initial build will fail as it lacks some necessary parameters.
+NOTE: The initial build will fail as it lacks some necessary parameters.
 
 * Navigate to the job and press ``Build with parameters``:
 
@@ -70,7 +70,7 @@ Post configuration and running an initial job
 
 * Add a ``secret text`` credential for the kayobe vault password:
 
-.. image: images/vault-password.png
+.. image:: images/vault-password.png
 
 * Start a run with a command of your choice. In the example we are
   running: ``kayobe network connectivity check```:
