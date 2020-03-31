@@ -1,6 +1,6 @@
 jobs:
   - script: >
-      pipelineJob('kayobe-service-reconfigure') {
+      pipelineJob('kayobe-run-command') {
         definition {
           cpsScm {
             scm {
