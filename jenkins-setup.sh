@@ -41,6 +41,7 @@ sudo cp -r jenkins-config/ /var/jenkins-home/
 echo "jenkins container id:"
 sudo docker run --name=jenkins \
      --env="VIRTUAL_PORT=8080" \
+     --env="JENKINS_HOME=/var/jenkins-home" \
      --env="VIRTUAL_HOST=${jenkins_virtual_host}" \
      --volume="/var/jenkins-home:/var/jenkins-home:rw" \
      --volume="/var/run/docker.sock:/var/run/docker.sock:ro" \
