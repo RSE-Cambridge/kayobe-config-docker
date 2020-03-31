@@ -49,8 +49,8 @@ USER jenkins
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
-COPY jenkins-config /var/jenkins-home/jenkins-config
-ENV CASC_JENKINS_CONFIG=/var/jenkins-home/jenkins-config
+COPY jenkins-config /var/jenkins_home/jenkins-config
+ENV CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins-config
 USER root
 
 ENTRYPOINT ["/entrypoint.sh"]
@@ -61,7 +61,7 @@ ARG VCS_REF
 ARG IMAGE_PATCH_VER=0
 LABEL \
     org.label-schema.build-date=$BUILD_DATE \
-    org.label-schema.docker.cmd="docker run -d -p 8080:8080 -v \"$$(pwd)/jenkins-home:/var/jenkins-home\" -v /var/run/docker.sock:/var/run/docker.sock sudobmitch/jenkins-docker" \
+    org.label-schema.docker.cmd="docker run -d -p 8080:8080 -v \"$$(pwd)/jenkins_home:/var/jenkins_home\" -v /var/run/docker.sock:/var/run/docker.sock sudobmitch/jenkins-docker" \
     org.label-schema.description="Jenkins with docker support, Jenkins ${JENKINS_VER}, Docker ${DOCKER_VER}" \
     org.label-schema.name="bmitch3020/jenkins-docker" \
     org.label-schema.schema-version="1.0" \
