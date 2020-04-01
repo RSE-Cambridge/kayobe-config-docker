@@ -12,5 +12,3 @@
       tags: proxy
     - import_tasks: tasks/jenkins.yml
       tags: jenkins
-
-
