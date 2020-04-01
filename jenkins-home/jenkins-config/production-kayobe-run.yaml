@@ -1,0 +1,17 @@
+jobs:
+  - script: >
+      pipelineJob('production-kayobe-run-command') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('https://github.com/RSE-Cambridge/cumulus-kayobe-config')
+                }
+                branch('*/train')
+              }
+            }
+            lightweight()
+          }
+        }
+      }

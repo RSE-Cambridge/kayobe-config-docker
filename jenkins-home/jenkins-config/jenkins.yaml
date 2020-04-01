@@ -15,10 +15,17 @@ jenkins:
     sites:
     - id: "default"
       url: "https://updates.jenkins-ci.org/update-center.json"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "{{ config_as_code_admin_password }}"
+  authorizationStrategy: loggedInUsersCanDoAnything
 
 unclassified:
   location:
-    url: "http://10.60.150.1"
+    url: "http://{{ config_as_code_url }}"
   pipeline-model-docker:
     dockerLabel: "docker"
 

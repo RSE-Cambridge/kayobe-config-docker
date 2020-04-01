@@ -1,0 +1,12 @@
+---
+
+- assert: { that: "config_as_code_admin_ssh_key is defined" }
+- assert: { that: "config_as_code_url is defined" }
+- assert: { that: "config_as_code_admin_password is defined" }
+- assert: { that: "config_as_code_vault_password is defined" }
+- assert: { that: "config_as_code_kayobe_config_repo is defined" }
+- assert: { that: "config_as_code_kayobe_config_branch is defined" }
+- assert: { that: "config_as_code_allowed_script_hashes is defined" }
+- assert: { that: "jenkins_virtual_host is defined" }
+- assert: { that: "jenkins_image is defined" }
+- assert: { that: "jenkins_image_tag is defined" }

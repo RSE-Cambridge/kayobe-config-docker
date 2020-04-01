@@ -6,9 +6,9 @@ jobs:
             scm {
               git {
                 remote {
-                  url('https://github.com/RSE-Cambridge/cumulus-kayobe-config')
+                  url('{{ config_as_code_kayobe_config_repo }}')
                 }
-                branch('*/preprod-train-jenkins')
+                branch('*/{{ config_as_code_kayobe_config_branch }}')
               }
             }
             lightweight()

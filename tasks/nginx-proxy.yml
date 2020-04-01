@@ -1,0 +1,6 @@
+---
+- name: Include nginx proxy role
+  include_role:
+    name: stackhpc.nginx-proxy
+  vars:
+    nginx_proxy_action: deploy

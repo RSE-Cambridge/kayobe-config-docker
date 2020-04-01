@@ -1,0 +1,48 @@
+---
+
+# host to password file mapping definining the credentials for HTTP basic auth
+nginx_proxy_htpasswd_files:
+  10.60.150.1: encrypted/htpasswd
+
+# SSH key used by jenkins to log into overcloud/undercloud hosts
+config_as_code_admin_ssh_key: "{{lookup('file', 'encrypted/id_rsa_jenkins')}}"
+# IP or host where jenkins will listen
+config_as_code_url: "{{ jenkins_virtual_host }}"
+# Password for the jenkins admin user
+config_as_code_admin_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          38613564313264343564363037346532623034376137396634616338646463323761393634653437
+          6266653134323131656563646130363636343938303231350a353137313731326439643736353763
+          37343163353235336336636335326464653937636231633865303032396132393739376139363331
+          6462663365636439610a363138363939323766393738633863303563643963306664396565323937
+          36313434326365616163623433363635623662376564386137376239373065363239616436666530
+          3434623134376335646138396530626363326165393364306463
+# ansible vault password used for kayobe-config
+config_as_code_vault_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          61663565666136623333393430326466356537336535393764326433346630366335663032346639
+          3065653132303539323534373032346666373766613639620a643232373838306138636431386265
+          31623163343133373731623063646631363537613235613138383631383031323063326166343235
+          6533663934346663370a386532396632643531306434373431393339353231613764313332643436
+          31366662353764393338613263626437316132353862333836353334613037326636613430636564
+          6666663035323232363065663933313631393733633637633032
+
+# Repository where the pipeline is defined.
+config_as_code_kayobe_config_repo: "https://github.com/RSE-Cambridge/cumulus-kayobe-config"
+config_as_code_kayobe_config_branch: preprod-train-jenkins
+
+# These must match the hashes of your pipelines. You can manually approve a hash by visiting
+# <jenkins_url>/scriptApproval/. The hashes can then be found in 
+# /var/jenkins_home/scriptApproval.xml
+config_as_code_allowed_script_hashes:
+  - eab7f968a638632fec256fd26376d44bd1866ece
+  - f0e89cc22135a2839a8a56b1d0c90af565b63210
+
+# A ip or host where jenkins will listen
+jenkins_virtual_host: 10.60.150.1
+# Name of the jenkins docker image
+jenkins_image: "{{ docker_registry }}/jenkins-docker"
+# Tag of the jenkins docker image
+jenkins_image_tag: latest
+# Local docker registry to push the image to
+docker_registry: "10.200.0.1:4000"

@@ -1,0 +1,16 @@
+---
+
+- hosts: localhost
+  tasks:
+    - import_tasks: tasks/validate.yml
+      tags: validate
+    - import_tasks: tasks/build.yml
+      tags: build
+    - import_tasks: tasks/config-as-code.yml
+      tags: config
+    - import_tasks: tasks/nginx-proxy.yml
+      tags: proxy
+    - import_tasks: tasks/jenkins.yml
+      tags: jenkins
+
+

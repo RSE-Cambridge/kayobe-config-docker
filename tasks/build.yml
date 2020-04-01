@@ -1,0 +1,8 @@
+---
+
+- name: Build jenkins image
+  shell: |-
+    ./jenkins-docker/build.sh
+    docker tag jenkins-docker:latest "{{ jenkins_image }}:{{ jenkins_image_tag }}"
+    docker push "{{ jenkins_image }}:{{ jenkins_image_tag }}"
+  become: true
