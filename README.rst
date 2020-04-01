@@ -107,7 +107,7 @@ Optionally, enable bash completion with:
 
 .. code-block::
 
-    (venv) [will@cumulus-seed kayobe-config-docker]$ . <(~/kayobe-env-train/venvs/kayobe/bin/kayobe complete
+    (venv) [will@cumulus-seed kayobe-config-docker]$ . <(~/kayobe-env-train/venvs/kayobe/bin/kayobe complete)
 
 Next, edit the variables in kayobe-wrapper.sh to suit your environment. Then load the script:
 
