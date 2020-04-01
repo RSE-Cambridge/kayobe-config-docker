@@ -6,7 +6,7 @@ A reference jenkins setup to run kayobe commands from a seed host.
 Setting up the environment
 --------------------------
 
-The deployment is automated using ansible. To install ansible in a virtual
+The deployment is automated using ``ansible``. To install ansible in a virtual
 enviroment you can use the following series of commands:
 
 .. code-block::
@@ -21,8 +21,8 @@ Next, you must install the ansible roles:
 
     ansible-galaxy -r requirements.yml -p roles
 
-You need to make sure your user is in the docker group. for
-example to add the user, ``will``:
+You need to make sure your user is in the docker group. For
+example, to add the user, ``will``:
 
 .. code-block::
 
@@ -65,7 +65,7 @@ credentials for the ``htpasswd`` file in ``encrypted/htpasswd`` can be generated
 
 You should encrypt the basic auth admin password and use it as the value of 
 ``config_as_code_admin_password``. The ``htpasswd`` line can be added to
-encrypted/htpasswd as follows:
+``encrypted/htpasswd`` as follows:
 
 .. code-block::
 
@@ -82,6 +82,7 @@ you will need to replace it with a new copy:
 The file in ``encrypted/id_rsa_jenkins`` was generated with:
 
 .. code-block::
+
      ssh-keygen -t rsa -b 4096 -f encrypted/id_rsa_jenkins
      ansible-vault encrypt --vault-password ~/vaultpassword encrypted/id_rsa_jenkin
 
