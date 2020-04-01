@@ -1,6 +1,6 @@
 jobs:
   - script: >
-      pipelineJob('kayobe-run-command') {
+      pipelineJob('kayobe-command-run') {
         definition {
           cpsScm {
             scm {
@@ -12,6 +12,44 @@ jobs:
               }
             }
             lightweight()
+          }
+        }
+      }
+  - script: >
+     pipelineJob('kayobe-overcloud-service-reconfigure') {
+        definition {
+          cps {
+            script("""\
+              pipeline {
+                options { disableConcurrentBuilds() }
+                agent any
+                stages {
+                    stage ("Run command") {
+                        steps {
+                            build job: 'kayobe-command-run', parameters: [credentials(description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', value: 'kayobe-ssh-private-key'), credentials(description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD', value: 'kayobe-vault-password'), string(name: 'DOCKER_REGISTRY', value: 'http://localhost:4000/'), string(name: 'COMMAND', value: 'kayobe overcloud service reconfigure'), credentials(description: 'Kayobe SSH Config file', name: 'KAYOBE_SSH_CONFIG', value: '')]
+                        }
+                    }
+                }
+              }""".stripIndent())
+          }
+        }
+      }
+  - script: >
+     pipelineJob('kayobe-network-connectivity-check') {
+        definition {
+          cps {
+            script("""\
+              pipeline {
+                options { disableConcurrentBuilds() }
+                agent any
+                stages {
+                    stage ("Run command") {
+                        steps {
+                            build job: 'kayobe-command-run', parameters: [credentials(description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', value: 'kayobe-ssh-private-key'), credentials(description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD', value: 'kayobe-vault-password'), string(name: 'DOCKER_REGISTRY', value: 'http://localhost:4000/'), string(name: 'COMMAND', value: 'kayobe network connectivity check'), credentials(description: 'Kayobe SSH Config file', name: 'KAYOBE_SSH_CONFIG', value: '')]
+                        }
+                    }
+                } 
+              }""".stripIndent())
           }
         }
       }
