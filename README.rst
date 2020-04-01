@@ -3,81 +3,131 @@ Kayobe-Config-Docker
 
 A reference jenkins setup to run kayobe commands from a seed host.
 
-How to use
-----------
+Setting up the environment
+--------------------------
 
+The deployment is automated using ansible. To install ansible in a virtual
+enviroment you can use the following series of commands:
+
+.. code-block::
+
+    virtualenv venv && source venv/bin/activate
+    pip install -U pip
+    pip install -r requirements.txt
+
+Next, you must install the ansible roles:
+
+.. code-block::
+
+    ansible-galaxy -r requirements.yml -p roles
+
+You need to make sure your user is in the docker group. for
+example to add the user, ``will``:
+
+.. code-block::
+
+    sudo usermod -a -G docker will
+    newgrp docker
+
+You are now ready to perform the configuration.
+
+Configuration
+-------------
 First add the contents of the `kayobe-docker` directory
 to the root of your Kayobe-Config repo like so::
     kayobe_config/
     ├── Dockerfile
     ├── Jenkinsfile
     ├── docker-entrypoint.sh
-    ├── ansible.cfg
-
-If an `ansible.cfg` file already exists in the kayobe-config
-repo then this file will need to be merged.
 
 Don't forget to add and commit the changes to the branch
 you wish to deploy. Eventually this will be upstream in
 the kayobe_config templates.
 
-Next, edit the contents of jenkins_config (if necessary)
-and ensure the following:
+Next, edit the contents of ``config.yml`` to suit your environment. 
+The file contains all the environment specific configuration and 
+has been annotated to explain the function of each variable. To 
+generate the encryped variables use a command similar to the following:
 
- * The location url in `jenkins.yaml` should match the seed IP:
-    ``url: "http://192.168.33.5/"``
+.. code-block::
 
- * The url and branch lines of the pipeline script should match 
-   the Kayobe-Config repo (and branch) you wish to deploy::
-    url('https://github.com/Wasaac/a-universe-from-nothing')
-    branch('*/monasca-stein-dockerise')
+    echo -n 'mums-the-word' | ansible-vault encrypt_string --vault-password-file ~/vaultpassword --stdin-name 'config_as_code_vault_password'
+
+credentials for the ``htpasswd`` file in ``encrypted/htpasswd`` can be generated with:
+
+.. code-block::
+
+    (venv) [will@cumulus-seed kayobe-config-docker]$ ./generate-credentials.sh 
+    Jenkins basic auth admin password:
+    kmXfSU+3Re8/OIkHb0eQmmAsMqtRr1K8tB37dI2yDxw=
+    htpasswd line for admin user:
+    admin:$apr1$2NLhaV0V$tskpeMnNZC4KZDadt42zS0
+
+You should encrypt the basic auth admin password and use it as the value of 
+``config_as_code_admin_password``. The ``htpasswd`` line can be added to
+encrypted/htpasswd as follows:
+
+.. code-block::
+
+    ansible-vault edit encrypted/htpasswd --vault-password ~/vaultpassword
+
+Taking care to remove any old entries. If you don't have the key for the file
+you will need to replace it with a new copy:
+
+.. code-block::
+
+    touch encrypted/htpasswd
+    ansible-vault encrypt --vault-password ~/vaultpassword encrypted/htpasswd
+
+The file in ``encrypted/id_rsa_jenkins`` was generated with:
+
+.. code-block::
+     ssh-keygen -t rsa -b 4096 -f encrypted/id_rsa_jenkins
+     ansible-vault encrypt --vault-password ~/vaultpassword encrypted/id_rsa_jenkin
 
 Deploying
 ---------
-Copy or clone this repo (with your changes) onto a Kayobe
-seed node and run ``jenkins_setup.sh`` as a user with both sudo
-and docker privileges.
+Copy or clone this repo (with your changes) onto a Kayobe seed node. 
+Proceed with the enviroment and configuration instructions, then run:
 
-Post configuration and running an initial job
----------------------------------------------
+.. code-block::
 
-* Retrieve the secret from the output of ``jenkins_setup.sh``:
+    ansible-playbook deploy.yml --vault-password-file ~/vaultpassword -e@config.yml 
 
-.. image:: images/password-output.png
+as a user with both sudo and docker privileges. The option given to 
+``--vault-password-file`` should contain the password used to encrypt 
+the secrets in ``config.yml``
 
-* Navigate to the address set using ``jenkins_virtual_host`` and
-  enter the password from the previous step (the username is admin):
+Using the kayobe wrapper script
+-------------------------------
 
-.. image:: images/login.png
+This allows you to submit arbitary kayobe commands for jenkins to run via a CLI. 
+Optionally, enable bash completion with:
 
-* Start a build to trigger the initial import of the job:
+.. code-block::
 
-.. image:: images/initial-build.png
+    (venv) [will@cumulus-seed kayobe-config-docker]$ . <(~/kayobe-env-train/venvs/kayobe/bin/kayobe complete
 
-NOTE: The initial build will fail as it lacks some necessary parameters.
+Next, edit the variables in kayobe-wrapper.sh to suit your environment. Then load the script:
 
-* Navigate to the job and press ``Build with parameters``:
+.. code-block::
 
-.. image:: images/build-with-parameters.png
+    . kayobe-wrapper.sh
 
-* Add an SSH private key by clicking ``jenkins`` under the ``Add`` button:
+Set the token:
 
-.. image:: images/ssh-key-1.png
+.. code-block::
 
-* Fill in the details as shown in the screenshot below:
+    export JENKINS_TOKEN=password
 
-.. image:: images/ssh-key-2.png
+You can then run commands, e.g:
 
-* Add a ``secret text`` credential for the kayobe vault password:
+.. code-block::
 
-.. image:: images/vault-password.png
-
-* Start a run with a command of your choice. In the example we are
-  running: ``kayobe network connectivity check```:
-
-.. image:: images/build.png
+    (venv) [will@cumulus-seed kayobe-config-docker]$ kayobe network connectivity check 
+    Posting: {"parameter": [{"name":"COMMAND", "value":"kayobe network connectivity check"}]} to http://10.60.150.1/job/kayobe-command-run/build
 
 TODO
 ####
 
-Replace setup script with ansible playbook and template jenkins config.
+* Support teardown via ansible
