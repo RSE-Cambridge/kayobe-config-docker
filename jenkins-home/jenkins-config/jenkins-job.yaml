@@ -39,4 +39,23 @@ jobs:
       }
 {{ generate_job(environment, 'kayobe-overcloud-service-reconfigure', 'kayobe overcloud service reconfigure') }}
 {{ generate_job(environment, 'kayobe-network-connectivity-check', 'kayobe network connectivity check') }}
+{% if config_as_code_feature_tempest_enabled | default(false) %}
+  - script: >
+      pipelineJob('{{ environment }}-tempest') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('{{ config["tempest_repo"] }}')
+                }
+                branch('*/{{ config["tempest_branch" | default("master")] }}')
+              }
+            }
+            scriptPath('{{ config["tempest_jenkinsfile"] | default("Jenkinsfile") }}')
+            lightweight()
+          }
+        }
+      }
+{% endif %}
 {% endfor %}

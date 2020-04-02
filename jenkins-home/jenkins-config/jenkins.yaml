@@ -30,6 +30,19 @@ unclassified:
     dockerLabel: "docker"
 
 tool:
+{% if config_as_code_feature_tempest_enabled | default(false) %}
+  ansibleInstallation:
+    installations:
+    - name: "tempest-ansible"
+      properties:
+      - installSource:
+          installers:
+          - command:
+              command: |-
+                python -m virtualenv ansible-tempest/
+                ansible-tempest/bin/pip install ansible==2.9.1
+              toolHome: "ansible-tempest/bin"
+{% endif %}
   git:
     installations:
     - home: "git"

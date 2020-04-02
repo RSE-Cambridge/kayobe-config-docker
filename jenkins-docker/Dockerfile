@@ -15,6 +15,8 @@ RUN apt-get update \
      software-properties-common \
      vim \
      wget \
+     python-virtualenv \
+     rsync \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 

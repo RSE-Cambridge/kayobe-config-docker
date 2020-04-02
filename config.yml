@@ -1,11 +1,18 @@
 ---
 
+# Tempest integration is experimental and is gated by a feature flag
+config_as_code_feature_tempest_enabled: true
+
 # host to password file mapping definining the credentials for HTTP basic auth
 nginx_proxy_htpasswd_files:
   10.60.150.1: encrypted/htpasswd
 
 # SSH key used by jenkins to log into overcloud/undercloud hosts
 config_as_code_admin_ssh_key: "{{lookup('file', 'encrypted/id_rsa_jenkins')}}"
+
+# SSH key used by tempest to log into overcloud/undercloud hosts
+config_as_code_tempest_ssh_key: "{{lookup('file', 'encrypted/id_rsa_tempest')}}"
+
 # IP or host where jenkins will listen
 config_as_code_url: "{{ jenkins_virtual_host }}"
 # Password for the jenkins admin user
@@ -26,6 +33,15 @@ config_as_code_vault_password: !vault |
           6533663934346663370a386532396632643531306434373431393339353231613764313332643436
           31366662353764393338613263626437316132353862333836353334613037326636613430636564
           6666663035323232363065663933313631393733633637633032
+# ansible vault password used for the jenkins-pipelines repository
+config_as_code_tempest_vault_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37616263366335373865333766303238623963613766656630303638303433373664343636626335
+          6262313036666465363538336234343161623561323433650a363364333831306335666638306539
+          62383135393964386264316635336162666466363266383139343039383939663661343661343136
+          3333643430313032310a316432353630666366396265303234316166366365376535303639383632
+          39336265383637346462316130393764653935363462366136633031303735613266633861643337
+          3631633862363239356662616430323435623832353331363939
 
 # Details about the environment. Environment specifc jobs will be prefixed by the key.
 config_as_code_kayobe_environments:
@@ -33,6 +49,9 @@ config_as_code_kayobe_environments:
     # Repository where the pipeline is defined
     repo: "https://github.com/RSE-Cambridge/cumulus-kayobe-config"
     branch: preprod-train-jenkins
+    tempest_repo: "https://github.com/jovial/jenkins-pipelines"
+    tempest_branch: master
+    tempest_jenkinsfile: tempest.jenkinsfile
     # TODO: environment specifc credentials
 
 # These must match the hashes of your pipelines. You can manually approve a hash by visiting
