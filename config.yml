@@ -46,9 +46,10 @@ config_as_code_tempest_vault_password: !vault |
 # Details about the environment. Environment specifc jobs will be prefixed by the key.
 config_as_code_kayobe_environments:
   staging:
-    # Repository where the pipeline is defined
+    # Repository where the kayobe pipeline is defined
     repo: "https://github.com/RSE-Cambridge/cumulus-kayobe-config"
     branch: preprod-train-jenkins
+    # Configuration of tempest (enabled with `config_as_code_feature_tempest_enabled`)
     tempest_repo: "https://github.com/jovial/jenkins-pipelines"
     tempest_branch: master
     tempest_jenkinsfile: tempest.jenkinsfile
