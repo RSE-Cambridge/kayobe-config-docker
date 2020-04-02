@@ -1,7 +1,7 @@
 export JENKINS_URL=http://10.60.150.1
 export JENKINS_USER=admin
 export COOKIE_JAR=/tmp/cookies
-export JOB=kayobe-command-run
+export JOB=staging-kayobe-command-run
 
 function kayobe {
   CMD=( "kayobe" "${@}" )

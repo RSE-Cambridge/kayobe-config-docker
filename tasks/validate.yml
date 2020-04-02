@@ -4,9 +4,16 @@
 - assert: { that: "config_as_code_url is defined" }
 - assert: { that: "config_as_code_admin_password is defined" }
 - assert: { that: "config_as_code_vault_password is defined" }
-- assert: { that: "config_as_code_kayobe_config_repo is defined" }
-- assert: { that: "config_as_code_kayobe_config_branch is defined" }
 - assert: { that: "config_as_code_allowed_script_hashes is defined" }
+
+- assert: { that: "config_as_code_kayobe_environments is defined" }
+- assert: { that: "config_as_code_kayobe_environments.keys() | length > 0" }
+- assert:
+    that:
+      - "'repo' in item.value"
+      - "'branch' in item.value"
+  with_dict: "{{ config_as_code_kayobe_environments }}"
+
 - assert: { that: "jenkins_virtual_host is defined" }
 - assert: { that: "jenkins_image is defined" }
 - assert: { that: "jenkins_image_tag is defined" }
