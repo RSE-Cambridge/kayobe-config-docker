@@ -1,0 +1,61 @@
+{% macro generate_job(environment, name, cmd) %}
+  - script: >
+     pipelineJob('{{ environment }}-{{ name }}') {
+        definition {
+          cps {
+            script("""\
+              pipeline {
+                options { disableConcurrentBuilds() }
+                agent any
+                stages {
+                    stage ("Run command") {
+                        steps {
+                            build job: '{{ environment }}-kayobe-command-run', parameters: [credentials(description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', value: 'kayobe-ssh-private-key'), credentials(description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD', value: 'kayobe-vault-password'), string(name: 'DOCKER_REGISTRY', value: 'http://localhost:4000/'), string(name: 'COMMAND', value: '{{ cmd }}'), credentials(description: 'Kayobe SSH Config file', name: 'KAYOBE_SSH_CONFIG', value: '')]
+                        }
+                    }
+                  }
+              }""".stripIndent())
+          }
+        }
+      }
+{% endmacro %}
+jobs:
+{% for environment, config in config_as_code_kayobe_environments.items() %}
+  - script: >
+      pipelineJob('{{ environment }}-kayobe-command-run') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('{{ config["repo"] }}')
+                }
+                branch('*/{{ config["branch"] }}')
+              }
+            }
+            lightweight()
+          }
+        }
+      }
+{{ generate_job(environment, 'kayobe-overcloud-service-reconfigure', 'kayobe overcloud service reconfigure') }}
+{{ generate_job(environment, 'kayobe-network-connectivity-check', 'kayobe network connectivity check') }}
+{% if config_as_code_feature_tempest_enabled | default(false) %}
+  - script: >
+      pipelineJob('{{ environment }}-tempest') {
+        definition {
+          cpsScm {
+            scm {
+              git {
+                remote {
+                  url('{{ config["tempest_repo"] }}')
+                }
+                branch('*/{{ config["tempest_branch" | default("master")] }}')
+              }
+            }
+            scriptPath('{{ config["tempest_jenkinsfile"] | default("Jenkinsfile") }}')
+            lightweight()
+          }
+        }
+      }
+{% endif %}
+{% endfor %}

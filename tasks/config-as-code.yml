@@ -1,0 +1,31 @@
+---
+- name: Ensure jenkins home directory exists
+  file:
+    path: '/var/jenkins_home/'
+    owner: "1000"
+    group: "1000"
+    mode: 0770
+    state: directory
+  become: true
+
+- name: Ensure jenkins config directory exists
+  file:
+    path: '/var/jenkins_home/jenkins-config'
+    owner: "1000"
+    group: "1000"
+    mode: 0770
+    state: directory
+  become: true
+
+- name: Template configuration as code
+  template:
+    src: "{{ item['src'] }}"
+    dest: "{{ '/var/jenkins_home/' + item.path }}"
+    owner: "1000"
+    group: "1000"
+    mode: 0660
+  with_filetree:
+    # item.path contains relative path
+    - jenkins-home/
+  when: item.state == 'file'
+  become: true

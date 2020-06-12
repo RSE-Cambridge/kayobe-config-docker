@@ -1,7 +1,7 @@
 FROM centos:7
 MAINTAINER isaac@stackhpc.com
 RUN yum update -y && \
-    yum install -y python-devel python-virtualenv gcc libffi-devel libselinux-python git sudo && \
+    yum install -y python-yaml python-devel python-virtualenv gcc libffi-devel libselinux-python git sudo which && \
     yum clean all
 
 ENV KAYOBE_USER=stack
@@ -29,8 +29,8 @@ ENV VIRTUAL_ENV="$VENVS_PATH/kayobe"
 RUN python -m virtualenv --python=/usr/bin/python $VIRTUAL_ENV
 ENV PATH="$VIRTUAL_ENV/bin:$PATH"
 
-ARG kayobe_version='7.0.0'
-ARG kayobe_repo='https://git.openstack.org/openstack/kayobe.git'
+ARG kayobe_version='cumulus/train'
+ARG kayobe_repo='https://github.com/RSE-Cambridge/kayobe'
 
 RUN git clone $kayobe_repo -b $kayobe_version $SRC_PATH/kayobe
 
@@ -47,6 +47,9 @@ ENV KOLLA_CONFIG_PATH=$KAYOBE_CONFIG_ROOT/etc/kolla
 ENV KOLLA_SOURCE_PATH=$SRC_PATH/kolla-ansible
 ENV KOLLA_VENV_PATH=$VENVS_PATH/kolla-ansible
 
-RUN kayobe control host bootstrap && rm -rf $HOME/.ssh
+# Strip the secrets so that we don't need to pass in a vault-password
+RUN grep -lR "\$ANSIBLE_VAULT" "$KAYOBE_CONFIG_PATH" | xargs rm && \
+    kayobe control host bootstrap && rm -rf $HOME/.ssh && \
+    pushd "$KAYOBE_CONFIG_ROOT" && git reset --hard && popd
 
 ENTRYPOINT ["/bin/entrypoint.sh"]

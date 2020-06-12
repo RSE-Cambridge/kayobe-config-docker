@@ -1,0 +1,49 @@
+jenkins:
+  agentProtocols:
+  - "JNLP4-connect"
+  clouds:
+  - docker:
+      dockerApi:
+        connectTimeout: 60
+        dockerHost:
+          uri: "unix:///var/run/docker.sock"
+        readTimeout: 60
+      name: "docker"
+  labelString: "docker"
+  slaveAgentPort: 50000
+  updateCenter:
+    sites:
+    - id: "default"
+      url: "https://updates.jenkins-ci.org/update-center.json"
+  securityRealm:
+    local:
+      allowsSignup: false
+      users:
+        - id: "admin"
+          password: "{{ config_as_code_admin_password }}"
+  authorizationStrategy: loggedInUsersCanDoAnything
+
+unclassified:
+  location:
+    url: "http://{{ config_as_code_url }}"
+  pipeline-model-docker:
+    dockerLabel: "docker"
+
+tool:
+{% if config_as_code_feature_tempest_enabled | default(false) %}
+  ansibleInstallation:
+    installations:
+    - name: "tempest-ansible"
+      properties:
+      - installSource:
+          installers:
+          - command:
+              command: |-
+                python -m virtualenv ansible-tempest/
+                ansible-tempest/bin/pip install ansible==2.9.1
+              toolHome: "ansible-tempest/bin"
+{% endif %}
+  git:
+    installations:
+    - home: "git"
+      name: "Default"

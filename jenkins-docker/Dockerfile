@@ -15,6 +15,8 @@ RUN apt-get update \
      software-properties-common \
      vim \
      wget \
+     python-virtualenv \
+     rsync \
  && apt-get clean \
  && rm -rf /var/lib/apt/lists/*
 
@@ -49,8 +51,7 @@ USER jenkins
 COPY plugins.txt /usr/share/jenkins/ref/plugins.txt
 RUN /usr/local/bin/install-plugins.sh < /usr/share/jenkins/ref/plugins.txt
 
-COPY jenkins_config /var/jenkins_home/jenkins_config
-ENV CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins_config
+ENV CASC_JENKINS_CONFIG=/var/jenkins_home/jenkins-config
 USER root
 
 ENTRYPOINT ["/entrypoint.sh"]
