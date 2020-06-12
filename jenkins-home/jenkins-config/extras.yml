@@ -1,0 +1,4 @@
+---
+{% if config_as_code_extras is defined %}
+{{ config_as_code_extras | to_nice_yaml(indent=2) }}
+{% endif %}

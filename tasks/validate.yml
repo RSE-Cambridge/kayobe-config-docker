@@ -12,6 +12,7 @@
     that:
       - "'repo' in item.value"
       - "'branch' in item.value"
+      - "not (config_as_code_feature_tempest_enabled | default(false) and 'tempest_repo' not in item.value)"
   with_dict: "{{ config_as_code_kayobe_environments }}"
 
 - assert: { that: "jenkins_virtual_host is defined" }

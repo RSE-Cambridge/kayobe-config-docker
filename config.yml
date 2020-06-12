@@ -1,11 +1,18 @@
 ---
 
+# Tempest integration is experimental and is gated by a feature flag
+config_as_code_feature_tempest_enabled: true
+
 # host to password file mapping definining the credentials for HTTP basic auth
 nginx_proxy_htpasswd_files:
   10.60.150.1: encrypted/htpasswd
 
 # SSH key used by jenkins to log into overcloud/undercloud hosts
 config_as_code_admin_ssh_key: "{{lookup('file', 'encrypted/id_rsa_jenkins')}}"
+
+# SSH key used by tempest to log into overcloud/undercloud hosts
+config_as_code_tempest_ssh_key: "{{lookup('file', 'encrypted/id_rsa_tempest')}}"
+
 # IP or host where jenkins will listen
 config_as_code_url: "{{ jenkins_virtual_host }}"
 # Password for the jenkins admin user
@@ -26,13 +33,34 @@ config_as_code_vault_password: !vault |
           6533663934346663370a386532396632643531306434373431393339353231613764313332643436
           31366662353764393338613263626437316132353862333836353334613037326636613430636564
           6666663035323232363065663933313631393733633637633032
+# ansible vault password used for the jenkins-pipelines repository
+config_as_code_tempest_vault_password: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          37616263366335373865333766303238623963613766656630303638303433373664343636626335
+          6262313036666465363538336234343161623561323433650a363364333831306335666638306539
+          62383135393964386264316635336162666466363266383139343039383939663661343661343136
+          3333643430313032310a316432353630666366396265303234316166366365376535303639383632
+          39336265383637346462316130393764653935363462366136633031303735613266633861643337
+          3631633862363239356662616430323435623832353331363939
+# Token for Slack integration
+config_as_code_secret_slack: !vault |
+          $ANSIBLE_VAULT;1.1;AES256
+          36326236616235333832626535666662613833656262626466383936633532333331366364376337
+          6663363433643839663163376461396663366633636533340a336164666135623133393236373637
+          33383837633232313735333039373836633965376232333035363463386231663831616239303734
+          3237386531356438320a383964333034633137646363663737366361326435376462333036326364
+          33376232333230363039363434356666383131376165373236373531666362363233
 
 # Details about the environment. Environment specifc jobs will be prefixed by the key.
 config_as_code_kayobe_environments:
   staging:
-    # Repository where the pipeline is defined
+    # Repository where the kayobe pipeline is defined
     repo: "https://github.com/RSE-Cambridge/cumulus-kayobe-config"
     branch: preprod-train-jenkins
+    # Configuration of tempest (enabled with `config_as_code_feature_tempest_enabled`)
+    tempest_repo: "https://github.com/jovial/jenkins-pipelines"
+    tempest_branch: master
+    tempest_jenkinsfile: tempest.jenkinsfile
     # TODO: environment specifc credentials
 
 # These must match the hashes of your pipelines. You can manually approve a hash by visiting
@@ -41,6 +69,36 @@ config_as_code_kayobe_environments:
 config_as_code_allowed_script_hashes:
   - 794ec0c83d4ecd19b97acd230d41ef00c1b39dc2
   - c214ff8a70297fba33702041ea5ec1547635d742
+
+config_as_code_extras:
+  credentials:
+    system:
+      domainCredentials:
+        - credentials:
+          - string:
+              description: "For slack integration"
+              id: "slack_secret"
+              scope: GLOBAL
+              secret: "{{ config_as_code_secret_slack }}"
+  unclassified:
+    globalSlackNotifier:
+        failureMessage: "Your build failed."
+        failureRoom: "cumulus-jenkins"
+        notBuiltMessage: "There is trouble in the cloud."
+        notBuiltRoom: "cumulus-jenkins"
+        notifyOnAborted: false
+        notifyOnFail: true
+        notifyOnNotBuilt: false
+        notifyOnSuccess: true
+        notifyOnUnstable: true
+        successMessage: "Your build passed."
+        successRoom: "cumulus-jenkins"
+    slackNotifier:
+      botUser: false
+      room: "cumulus-jenkins"
+      sendAsText: false
+      teamDomain: "alaska-deploy"
+      tokenCredentialId: "slack_secret"
 
 # A ip or host where jenkins will listen
 jenkins_virtual_host: 10.60.150.1
