@@ -1,61 +1,57 @@
-{% macro generate_job(environment, name, cmd) %}
+{% macro generate_job(name, cmd) %}
   - script: >
-     pipelineJob('{{ environment }}-{{ name }}') {
+     pipelineJob('{{ name }}') {
         definition {
           cps {
-            script("""\
+            script('''\
               pipeline {
                 options { disableConcurrentBuilds() }
                 agent any
+                parameters {
+                  string(defaultValue: "{{ config_as_code_kayobe_config_branches[0] }}", description: "Branch of kayobe config repository to use", name: "branch")
+                }
                 stages {
                     stage ("Run command") {
                         steps {
-                            build job: '{{ environment }}-kayobe-command-run', parameters: [credentials(description: 'Kayobe SSH Key', name: 'KAYOBE_SSH_CREDS', value: 'kayobe-ssh-private-key'), credentials(description: 'Kayobe Ansible Vault Password', name: 'KAYOBE_VAULT_PASSWORD', value: 'kayobe-vault-password'), string(name: 'DOCKER_REGISTRY', value: 'http://localhost:4000/'), string(name: 'COMMAND', value: '{{ cmd }}'), credentials(description: 'Kayobe SSH Config file', name: 'KAYOBE_SSH_CONFIG', value: '')]
+                            build job: "kayobe-command-run/${java.net.URLEncoder.encode(params.branch, 'UTF-8')}", parameters: [credentials(description: "Kayobe SSH Key", name: "KAYOBE_SSH_CREDS", value: "kayobe-ssh-private-key"), credentials(description: "Kayobe Ansible Vault Password", name: "KAYOBE_VAULT_PASSWORD", value: "kayobe-vault-password"), string(name: "DOCKER_REGISTRY", value: "{{ docker_proto }}://{{ docker_registry }}"), string(name: "COMMAND", value: "{{ cmd }}), credentials(description: "Kayobe SSH Config file", name: "KAYOBE_SSH_CONFIG", value: "")]
                         }
                     }
                   }
-              }""".stripIndent())
+              }'''.stripIndent())
           }
         }
       }
 {% endmacro %}
 jobs:
-{% for environment, config in config_as_code_kayobe_environments.items() %}
   - script: >
-      pipelineJob('{{ environment }}-kayobe-command-run') {
-        definition {
-          cpsScm {
-            scm {
-              git {
-                remote {
-                  url('{{ config["repo"] }}')
-                }
-                branch('*/{{ config["branch"] }}')
-              }
-            }
-            lightweight()
+      multibranchPipelineJob('kayobe-command-run') {
+        branchSources {
+          git {
+            id('kayobe-config')
+            remote('{{ config_as_code_kayobe_config_repo }}')
+            includes('{{ config_as_code_kayobe_config_branches | join("") }}')
           }
         }
       }
-{{ generate_job(environment, 'kayobe-overcloud-service-reconfigure', 'kayobe overcloud service reconfigure') }}
-{{ generate_job(environment, 'kayobe-network-connectivity-check', 'kayobe network connectivity check') }}
+# These don't work as the ${java.net.URLEncoder.encode( is getting intrepretted on load
+# generate_job('kayobe-overcloud-service-reconfigure', 'kayobe overcloud service reconfigure')
+# generate_job('kayobe-network-connectivity-check', 'kayobe network connectivity check')
 {% if config_as_code_feature_tempest_enabled | default(false) %}
   - script: >
-      pipelineJob('{{ environment }}-tempest') {
+      pipelineJob('tempest') {
         definition {
           cpsScm {
             scm {
               git {
                 remote {
-                  url('{{ config["tempest_repo"] }}')
+                  url('{{ config_as_code_tempest_repo }}')
                 }
-                branch('*/{{ config["tempest_branch" | default("master")] }}')
+                branch('*/{{ config_as_code_tempest_branch | default("master") }}')
               }
             }
-            scriptPath('{{ config["tempest_jenkinsfile"] | default("Jenkinsfile") }}')
+            scriptPath('{{ config_as_code_tempest_jenkinsfile | default("Jenkinsfile") }}')
             lightweight()
           }
         }
       }
 {% endif %}
-{% endfor %}

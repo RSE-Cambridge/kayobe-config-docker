@@ -6,14 +6,16 @@
 - assert: { that: "config_as_code_vault_password is defined" }
 - assert: { that: "config_as_code_allowed_script_hashes is defined" }
 
-- assert: { that: "config_as_code_kayobe_environments is defined" }
-- assert: { that: "config_as_code_kayobe_environments.keys() | length > 0" }
+- assert: { that: "config_as_code_kayobe_config_repo is defined" }
+- assert: { that: "config_as_code_kayobe_config_branches is defined" }
+- assert: { that: "config_as_code_kayobe_config_branches is not string" }
+- assert: { that: "config_as_code_kayobe_config_branches | length > 0" }
+
 - assert:
-    that:
-      - "'repo' in item.value"
-      - "'branch' in item.value"
-      - "not (config_as_code_feature_tempest_enabled | default(false) and 'tempest_repo' not in item.value)"
-  with_dict: "{{ config_as_code_kayobe_environments }}"
+    that: 
+      - "config_as_code_tempest_repo is defined"
+      - "config_as_code_tempest_ssh_key is defined"
+  when: config_as_code_feature_tempest_enabled
 
 - assert: { that: "jenkins_virtual_host is defined" }
 - assert: { that: "jenkins_image is defined" }

@@ -4,10 +4,10 @@ ant:1.11
 antisamy-markup-formatter:2.0
 build-timeout:1.19.1
 command-launcher:1.4
-configuration-as-code:1.36
-copyartifact:1.43.1
+configuration-as-code:1.41
+copyartifact:1.44
 credentials:2.3.5
-credentials-binding:1.21
+credentials-binding:1.23
 docker-plugin:1.1.9
 email-ext:2.69
 github-branch-source:2.6.0
@@ -30,3 +30,5 @@ timestamper:1.11.2
 windows-slaves:1.6
 workflow-aggregator:2.6
 ws-cleanup:0.38
+docker-workflow:1.23
+pipeline-utility-steps:2.6.0

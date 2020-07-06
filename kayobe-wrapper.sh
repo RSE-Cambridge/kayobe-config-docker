@@ -1,7 +1,14 @@
-export JENKINS_URL=http://10.60.150.1
+function urlencode() {
+ # https://stackoverflow.com/questions/37309551/how-to-urlencode-data-into-a-url-with-bash-or-curl
+  python -c 'import urllib, sys; print urllib.quote(sys.argv[1], sys.argv[2])' \
+    "$1" "$urlencode_safe"
+}
+
+export JENKINS_URL=http://10.41.253.100
 export JENKINS_USER=admin
 export COOKIE_JAR=/tmp/cookies
-export JOB=staging-kayobe-command-run
+export BRANCH=alt1/train
+export JOB=kayobe-command-run/job/$(urlencode "$BRANCH")
 
 function kayobe {
   CMD=( "kayobe" "${@}" )
@@ -16,3 +23,4 @@ function kayobe {
     -H $JENKINS_CRUMB  --cookie $COOKIE_JAR \
     --form json="$JSON"
 }
+
