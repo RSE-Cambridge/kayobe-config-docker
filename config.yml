@@ -5,70 +5,62 @@ config_as_code_feature_tempest_enabled: true
 
 # host to password file mapping definining the credentials for HTTP basic auth
 nginx_proxy_htpasswd_files:
-  10.60.150.1: encrypted/htpasswd
+  10.41.253.100: encrypted/htpasswd
 
 # SSH key used by jenkins to log into overcloud/undercloud hosts
 config_as_code_admin_ssh_key: "{{lookup('file', 'encrypted/id_rsa_jenkins')}}"
+config_as_code_tempest_ssh_key: "{{ config_as_code_admin_ssh_key }}"
 
 # SSH key used by tempest to log into overcloud/undercloud hosts
-config_as_code_tempest_ssh_key: "{{lookup('file', 'encrypted/id_rsa_tempest')}}"
+#config_as_code_tempest_ssh_key: "{{lookup('file', 'encrypted/id_rsa_tempest')}}"
 
 # IP or host where jenkins will listen
 config_as_code_url: "{{ jenkins_virtual_host }}"
 # Password for the jenkins admin user
 config_as_code_admin_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
-          38613564313264343564363037346532623034376137396634616338646463323761393634653437
-          6266653134323131656563646130363636343938303231350a353137313731326439643736353763
-          37343163353235336336636335326464653937636231633865303032396132393739376139363331
-          6462663365636439610a363138363939323766393738633863303563643963306664396565323937
-          36313434326365616163623433363635623662376564386137376239373065363239616436666530
-          3434623134376335646138396530626363326165393364306463
+          64383333623665613334303164313566303331663665363338366564363737646139366362613535
+          6132376163633634663236303966306261313561386631660a393130336663373332623730663831
+          37356231346334393039643666383132363364373232346562613638306137343338323463313364
+          3338633565643030350a313162393562343765383061396433383634363065633735626162356561
+          38303532386639656463373937313535323766366230333038653163373763393137656434346432
+          3634313032666663346566356664316538613936333031343966
 # ansible vault password used for kayobe-config
 config_as_code_vault_password: !vault |
           $ANSIBLE_VAULT;1.1;AES256
-          61663565666136623333393430326466356537336535393764326433346630366335663032346639
-          3065653132303539323534373032346666373766613639620a643232373838306138636431386265
-          31623163343133373731623063646631363537613235613138383631383031323063326166343235
-          6533663934346663370a386532396632643531306434373431393339353231613764313332643436
-          31366662353764393338613263626437316132353862333836353334613037326636613430636564
-          6666663035323232363065663933313631393733633637633032
-# ansible vault password used for the jenkins-pipelines repository
-config_as_code_tempest_vault_password: !vault |
-          $ANSIBLE_VAULT;1.1;AES256
-          37616263366335373865333766303238623963613766656630303638303433373664343636626335
-          6262313036666465363538336234343161623561323433650a363364333831306335666638306539
-          62383135393964386264316635336162666466363266383139343039383939663661343661343136
-          3333643430313032310a316432353630666366396265303234316166366365376535303639383632
-          39336265383637346462316130393764653935363462366136633031303735613266633861643337
-          3631633862363239356662616430323435623832353331363939
+          33316535383034633832666264323432326635613739643362306439343166653764663263653335
+          3239623930643634333437653030366333613834623835370a386664633932383464373962343866
+          66646664666139396432373036613134396634363165366333363032383934393366306433383061
+          3132323862363933380a663566313965373730393466373462316566383436303430636330663430
+          61643731346338303634613433313863656438636131353862613364373637653566366233333133
+          6637643566643934316562633432363861636630373937393735
+#ansible vault password used for the jenkins-pipelines repository
+config_as_code_tempest_vault_password: "{{ config_as_code_vault_password }}"
 # Token for Slack integration
 config_as_code_secret_slack: !vault |
           $ANSIBLE_VAULT;1.1;AES256
-          36326236616235333832626535666662613833656262626466383936633532333331366364376337
-          6663363433643839663163376461396663366633636533340a336164666135623133393236373637
-          33383837633232313735333039373836633965376232333035363463386231663831616239303734
-          3237386531356438320a383964333034633137646363663737366361326435376462333036326364
-          33376232333230363039363434356666383131376165373236373531666362363233
+          61366435303239383933353764373733366336356466623061333765383831326135306233613237
+          6438613563356566396262653138353263386465363332300a386130643338326231373265373437
+          66623161323136366532356134303736613337616232626534303666366133626439663266376363
+          3737386635613937610a366566633461346165383434316262333734356339663634363965633833
+          35353434326339623564306532343134646139333462306531303434643864393564
 
-# Details about the environment. Environment specifc jobs will be prefixed by the key.
-config_as_code_kayobe_environments:
-  staging:
-    # Repository where the kayobe pipeline is defined
-    repo: "https://github.com/RSE-Cambridge/cumulus-kayobe-config"
-    branch: preprod-train-jenkins
-    # Configuration of tempest (enabled with `config_as_code_feature_tempest_enabled`)
-    tempest_repo: "https://github.com/jovial/jenkins-pipelines"
-    tempest_branch: master
-    tempest_jenkinsfile: tempest.jenkinsfile
-    # TODO: environment specifc credentials
+# Configuration of kayobe-config repo
+config_as_code_kayobe_config_repo: "https://github.com/jovial/alaska-kayobe-config"
+config_as_code_kayobe_config_branches: 
+  - alt1/train
+
+# Configuration of tempest (enabled with `config_as_code_feature_tempest_enabled`)
+config_as_code_tempest_repo: "https://github.com/jovial/jenkins-pipelines"
+config_as_code_tempest_branch: alaska
+config_as_code_tempest_jenkinsfile: tempest.jenkinsfile
 
 # These must match the hashes of your pipelines. You can manually approve a hash by visiting
 # <jenkins_url>/scriptApproval/. The hashes can then be found in 
 # /var/jenkins_home/scriptApproval.xml
 config_as_code_allowed_script_hashes:
-  - 794ec0c83d4ecd19b97acd230d41ef00c1b39dc2
-  - c214ff8a70297fba33702041ea5ec1547635d742
+  - 326eff2fbd632fac5ba44cafca6a4971403120a5
+  - cc7d7801febb0e16f2a2023f164b0d1d14ad33de
 
 config_as_code_extras:
   credentials:
@@ -83,28 +75,29 @@ config_as_code_extras:
   unclassified:
     globalSlackNotifier:
         failureMessage: "Your build failed."
-        failureRoom: "cumulus-jenkins"
+        failureRoom: "alaska-jenkins"
         notBuiltMessage: "There is trouble in the cloud."
-        notBuiltRoom: "cumulus-jenkins"
+        notBuiltRoom: "alaska-jenkins"
         notifyOnAborted: false
         notifyOnFail: true
         notifyOnNotBuilt: false
         notifyOnSuccess: true
         notifyOnUnstable: true
         successMessage: "Your build passed."
-        successRoom: "cumulus-jenkins"
+        successRoom: "alaska-jenkins"
     slackNotifier:
       botUser: false
-      room: "cumulus-jenkins"
+      room: "alaska-jenkins"
       sendAsText: false
       teamDomain: "alaska-deploy"
       tokenCredentialId: "slack_secret"
 
 # A ip or host where jenkins will listen
-jenkins_virtual_host: 10.60.150.1
+jenkins_virtual_host: 10.41.253.100
 # Name of the jenkins docker image
 jenkins_image: "{{ docker_registry }}/jenkins-docker"
 # Tag of the jenkins docker image
 jenkins_image_tag: latest
 # Local docker registry to push the image to
-docker_registry: "10.200.0.1:4000"
+docker_registry: "10.41.253.100:5000"
+docker_proto: http
